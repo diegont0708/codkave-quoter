@@ -82,6 +82,16 @@ export default function Quoter({ promoCodes }: QuoterProps) {
   const generatePDF = async () => {
     if (!hasItems) return;
 
+    // Load logo as base64 so it renders correctly inside the iframe
+    const logoDataUrl = await fetch('/Logotipo Codkave.png')
+      .then(r => r.blob())
+      .then(b => new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(b);
+      })).catch(() => '');
+
     const { net, discount } = calc;
     const { deposit35, payment35, balance, financed, instalment } = payments;
     const now = new Date();
@@ -99,9 +109,10 @@ export default function Quoter({ promoCodes }: QuoterProps) {
 <style>body{margin:0;padding:0;background:#fff;font-family:Arial,sans-serif}table{border-collapse:collapse;width:100%}</style>
 </head><body>
 <table style="width:595px;background:#fff">
-<tr><td style="background:#1D2E56;padding:24px 28px">
+<tr><td style="background:#1D2E56;padding:24px 40px">
   <table><tr>
-    <td style="font-family:'Arial Black',Arial,sans-serif;font-size:26px;font-weight:900;color:#A601F1;letter-spacing:-1px;vertical-align:top">CodKave<br>
+    <td style="vertical-align:top">
+      ${logoDataUrl ? `<img src="${logoDataUrl}" style="height:44px;display:block;margin-bottom:6px" />` : `<span style="font-family:'Arial Black',Arial,sans-serif;font-size:26px;font-weight:900;color:#A601F1;letter-spacing:-1px">CodKave</span>`}<br>
       <span style="font-family:Arial,sans-serif;font-size:11px;font-weight:400;color:rgba(54,169,225,.85)">Web Design Agency &nbsp;·&nbsp; ABN 54 850 905 499 &nbsp;·&nbsp; Australia</span>
     </td>
     <td style="text-align:right;vertical-align:top;padding-left:20px;white-space:nowrap">
@@ -111,13 +122,13 @@ export default function Quoter({ promoCodes }: QuoterProps) {
     </td>
   </tr></table>
 </td></tr>
-<tr><td style="padding:22px 28px 0">
+<tr><td style="padding:22px 40px 0">
   <p style="font-size:20px;font-weight:700;margin:0 0 4px;color:#1D2E56;font-family:Arial,sans-serif">Service proposal</p>
   ${state.clientName ? `<p style="font-size:13px;margin:0 0 2px;color:#1D2E56;font-family:Arial,sans-serif">Prepared for: <strong>${state.clientName}</strong>${state.clientCompany ? ' &nbsp;·&nbsp; ' + state.clientCompany : ''}</p>` : ''}
   ${state.clientEmail ? `<p style="font-size:12px;color:#888;margin:0;font-family:Arial,sans-serif">${state.clientEmail}</p>` : ''}
 </td></tr>
 ${otItems.length ? `
-<tr><td style="padding:20px 28px 0">
+<tr><td style="padding:20px 40px 0">
   <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#36A9E1;margin:0 0 8px;font-family:Arial,sans-serif">Services</p>
   <table style="width:100%">
     <tr style="background:#1D2E56">
@@ -130,14 +141,14 @@ ${otItems.length ? `
   </table>
 </td></tr>` : ''}
 ${moItems.length ? `
-<tr><td style="padding:18px 28px 0">
+<tr><td style="padding:18px 40px 0">
   <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#36A9E1;margin:0 0 8px;font-family:Arial,sans-serif">Recurring services</p>
   <table style="width:100%">
     ${moItems.map((it, i) => row(it.name, fAUD(it.price) + '/mo', i % 2 !== 0)).join('')}
     <tr style="background:#eef0f7"><td style="padding:9px 14px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#1D2E56">  Monthly total</td><td style="padding:9px 14px;text-align:right;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;font-size:13px">${fAUD(calc.monthly)}/mo</td></tr>
   </table>
 </td></tr>` : ''}
-<tr><td style="padding:18px 28px 0">
+<tr><td style="padding:18px 40px 0">
   <table style="width:100%;background:#f5f3fb;border-left:4px solid #A601F1">
     <tr><td colspan="2" style="padding:14px 14px 8px;font-size:14px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">Payment plan</td></tr>
     ${sep}
@@ -156,7 +167,7 @@ ${moItems.length ? `
     `}
   </table>
 </td></tr>
-<tr><td style="padding:18px 28px 28px;text-align:center;font-family:Arial,sans-serif;font-size:11px;color:#bbb;border-top:1px solid #e8ecf4">
+<tr><td style="padding:18px 40px 28px;text-align:center;font-family:Arial,sans-serif;font-size:11px;color:#bbb;border-top:1px solid #e8ecf4">
   CodKave &nbsp;·&nbsp; ABN 54 850 905 499 &nbsp;·&nbsp; codkave.com.au &nbsp;·&nbsp; This quote expires ${formatDateTime(exp)}
 </td></tr>
 </table></body></html>`;
