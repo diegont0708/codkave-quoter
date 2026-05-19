@@ -109,16 +109,16 @@ export default function Quoter({ promoCodes }: QuoterProps) {
 <style>body{margin:0;padding:0;background:#fff;font-family:Arial,sans-serif}table{border-collapse:collapse;width:100%}</style>
 </head><body>
 <table style="width:595px;background:#fff">
-<tr><td style="background:#1D2E56;padding:24px 40px">
+<tr><td style="background:#ffffff;padding:24px 40px;border-bottom:3px solid #A601F1">
   <table><tr>
     <td style="vertical-align:top">
       ${logoDataUrl ? `<img src="${logoDataUrl}" style="height:44px;display:block;margin-bottom:6px" />` : `<span style="font-family:'Arial Black',Arial,sans-serif;font-size:26px;font-weight:900;color:#A601F1;letter-spacing:-1px">CodKave</span>`}<br>
-      <span style="font-family:Arial,sans-serif;font-size:11px;font-weight:400;color:rgba(54,169,225,.85)">Web Design Agency &nbsp;·&nbsp; ABN 54 850 905 499 &nbsp;·&nbsp; Australia</span>
+      <span style="font-family:Arial,sans-serif;font-size:11px;font-weight:400;color:#36A9E1">Web Design Agency &nbsp;·&nbsp; ABN 54 850 905 499 &nbsp;·&nbsp; Australia</span>
     </td>
     <td style="text-align:right;vertical-align:top;padding-left:20px;white-space:nowrap">
-      <span style="font-size:12px;color:rgba(255,255,255,.65);font-family:Arial,sans-serif">Date: ${formatDate(now)}</span><br>
-      <span style="font-size:12px;color:rgba(255,255,255,.65);font-family:Arial,sans-serif">Expires: ${formatDateTime(exp)}</span><br>
-      <span style="display:inline-block;margin-top:6px;background:rgba(229,57,53,.35);color:#ffbbbb;font-size:10px;padding:2px 8px;font-family:Arial,sans-serif">Valid 48 hours only</span>
+      <span style="font-size:12px;color:#888;font-family:Arial,sans-serif">Date: ${formatDate(now)}</span><br>
+      <span style="font-size:12px;color:#888;font-family:Arial,sans-serif">Expires: ${formatDateTime(exp)}</span><br>
+      <span style="display:inline-block;margin-top:6px;background:rgba(229,57,53,.1);color:#c62828;font-size:10px;padding:2px 8px;font-family:Arial,sans-serif;border:1px solid rgba(229,57,53,.3)">Valid 48 hours only</span>
     </td>
   </tr></table>
 </td></tr>
