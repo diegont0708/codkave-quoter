@@ -1,0 +1,126 @@
+{
+  "header": {
+    "title": "Quote builder",
+    "subtitle": "CodKave · AUD · Australia",
+    "abn": "ABN 54 850 905 499",
+    "adminLink": "Admin panel"
+  },
+  "client": {
+    "sectionTitle": "Client details",
+    "name": "Full name",
+    "company": "Business / company",
+    "email": "Email address"
+  },
+  "packages": {
+    "sectionTitle": "Website packages",
+    "mostPopular": "Most popular",
+    "recommended": "Recommended"
+  },
+  "addons": {
+    "sectionTitle": "Add-ons & extras"
+  },
+  "maintenance": {
+    "sectionTitle": "Maintenance plan",
+    "optional": "optional"
+  },
+  "extras": {
+    "monthly": "monthly",
+    "free": "Free",
+    "from": "from "
+  },
+  "summary": {
+    "oneTimeTotal": "One-time total",
+    "discountApplied": "Discount: -{amount} applied",
+    "monthlyRecurring": "+ {amount}/mo recurring",
+    "estimated": "* Estimated — subject to confirmation",
+    "selectedServices": "Selected services",
+    "noServices": "Select services to build your quote",
+    "paymentPlan": "Payment plan",
+    "btnFull": "35 / 35 / 30",
+    "btnInstalment": "Instalments",
+    "btn3months": "3 months · 5%",
+    "btn6months": "6 months · 8%",
+    "contractSigning": "Contract signing (35%)",
+    "designReview": "Design review (35%)",
+    "finalDelivery": "Final delivery (30%)",
+    "balanceFinanced": "Balance financed (30% + {rate}% interest)",
+    "monthlyInstalment": "Monthly instalment",
+    "recurring": "Recurring",
+    "totalMonthly": "Total monthly debit"
+  },
+  "promo": {
+    "sectionTitle": "Promo / referral code",
+    "placeholder": "Enter code",
+    "apply": "Apply",
+    "applied": "Applied: -{discount}",
+    "invalidCode": "Invalid or expired code.",
+    "emptyCode": "Please enter a code."
+  },
+  "actions": {
+    "downloadPdf": "Download PDF quote",
+    "sendToClient": "Send to client",
+    "emailRequired": "Add client email to enable sending",
+    "sending": "Sending...",
+    "sent": "Sent successfully!",
+    "error": "Error — try again",
+    "validity": "Valid 48 hours · CodKave · ABN 54 850 905 499"
+  },
+  "admin": {
+    "login": {
+      "title": "Admin panel",
+      "subtitle": "Secure access",
+      "cardTitle": "Admin access",
+      "cardDesc": "Sign in to manage quotes, discount codes and pricing.",
+      "email": "Email",
+      "password": "Password",
+      "signIn": "Sign in",
+      "cancel": "Cancel",
+      "invalidCredentials": "Invalid email or password."
+    },
+    "nav": {
+      "quotes": "Quotes",
+      "codes": "Codes",
+      "prices": "Prices",
+      "signOut": "Sign out",
+      "back": "Back to quoter"
+    },
+    "dashboard": {
+      "title": "Quotes",
+      "subtitle": "All submitted quotes",
+      "empty": "No quotes yet.",
+      "client": "Client",
+      "total": "Total",
+      "status": "Status",
+      "date": "Date",
+      "sent": "Sent",
+      "draft": "Draft"
+    },
+    "codes": {
+      "title": "Discount codes",
+      "subtitle": "Manage promo & referral codes",
+      "allCodes": "All codes",
+      "active": "active",
+      "inactive": "inactive",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "addTitle": "Add new code",
+      "codePlaceholder": "Code (e.g. SUMMER15)",
+      "percentOff": "% off",
+      "fixedOff": "$ off",
+      "valuePlaceholder": "Value",
+      "notePlaceholder": "Internal note (e.g. Referral from John)",
+      "add": "Add",
+      "noCodes": "No codes yet.",
+      "deleteConfirm": "Delete this code?",
+      "errEmpty": "Enter a code name.",
+      "errExists": "Code already exists.",
+      "errValue": "Enter a valid value."
+    },
+    "prices": {
+      "title": "Service prices",
+      "subtitle": "Edit pricing for all services",
+      "save": "Save changes",
+      "saved": "Saved!"
+    }
+  }
+}

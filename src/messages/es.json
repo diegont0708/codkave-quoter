@@ -1,0 +1,126 @@
+{
+  "header": {
+    "title": "Cotizador",
+    "subtitle": "CodKave · AUD · Australia",
+    "abn": "ABN 54 850 905 499",
+    "adminLink": "Panel admin"
+  },
+  "client": {
+    "sectionTitle": "Datos del cliente",
+    "name": "Nombre completo",
+    "company": "Negocio / empresa",
+    "email": "Correo electrónico"
+  },
+  "packages": {
+    "sectionTitle": "Paquetes web",
+    "mostPopular": "Más popular",
+    "recommended": "Recomendado"
+  },
+  "addons": {
+    "sectionTitle": "Complementos y extras"
+  },
+  "maintenance": {
+    "sectionTitle": "Plan de mantenimiento",
+    "optional": "opcional"
+  },
+  "extras": {
+    "monthly": "mensual",
+    "free": "Gratis",
+    "from": "desde "
+  },
+  "summary": {
+    "oneTimeTotal": "Total único",
+    "discountApplied": "Descuento: -{amount} aplicado",
+    "monthlyRecurring": "+ {amount}/mes recurrente",
+    "estimated": "* Estimado — sujeto a confirmación",
+    "selectedServices": "Servicios seleccionados",
+    "noServices": "Seleccioná servicios para armar tu cotización",
+    "paymentPlan": "Plan de pago",
+    "btnFull": "35 / 35 / 30",
+    "btnInstalment": "Cuotas",
+    "btn3months": "3 meses · 5%",
+    "btn6months": "6 meses · 8%",
+    "contractSigning": "Firma de contrato (35%)",
+    "designReview": "Revisión de diseño (35%)",
+    "finalDelivery": "Entrega final (30%)",
+    "balanceFinanced": "Saldo financiado (30% + {rate}% interés)",
+    "monthlyInstalment": "Cuota mensual",
+    "recurring": "Recurrente",
+    "totalMonthly": "Débito mensual total"
+  },
+  "promo": {
+    "sectionTitle": "Código promo / referido",
+    "placeholder": "Ingresá el código",
+    "apply": "Aplicar",
+    "applied": "Aplicado: -{discount}",
+    "invalidCode": "Código inválido o expirado.",
+    "emptyCode": "Por favor ingresá un código."
+  },
+  "actions": {
+    "downloadPdf": "Descargar cotización PDF",
+    "sendToClient": "Enviar al cliente",
+    "emailRequired": "Agregá el email del cliente para enviar",
+    "sending": "Enviando...",
+    "sent": "¡Enviado con éxito!",
+    "error": "Error — intentá de nuevo",
+    "validity": "Válido 48 horas · CodKave · ABN 54 850 905 499"
+  },
+  "admin": {
+    "login": {
+      "title": "Panel admin",
+      "subtitle": "Acceso seguro",
+      "cardTitle": "Acceso admin",
+      "cardDesc": "Iniciá sesión para gestionar cotizaciones, códigos y precios.",
+      "email": "Email",
+      "password": "Contraseña",
+      "signIn": "Ingresar",
+      "cancel": "Cancelar",
+      "invalidCredentials": "Email o contraseña incorrectos."
+    },
+    "nav": {
+      "quotes": "Cotizaciones",
+      "codes": "Códigos",
+      "prices": "Precios",
+      "signOut": "Cerrar sesión",
+      "back": "Volver al cotizador"
+    },
+    "dashboard": {
+      "title": "Cotizaciones",
+      "subtitle": "Todas las cotizaciones enviadas",
+      "empty": "Sin cotizaciones aún.",
+      "client": "Cliente",
+      "total": "Total",
+      "status": "Estado",
+      "date": "Fecha",
+      "sent": "Enviado",
+      "draft": "Borrador"
+    },
+    "codes": {
+      "title": "Códigos de descuento",
+      "subtitle": "Gestionar códigos promo y de referidos",
+      "allCodes": "Todos los códigos",
+      "active": "activos",
+      "inactive": "inactivos",
+      "activate": "Activar",
+      "deactivate": "Desactivar",
+      "addTitle": "Agregar nuevo código",
+      "codePlaceholder": "Código (ej. VERANO15)",
+      "percentOff": "% desc.",
+      "fixedOff": "$ desc.",
+      "valuePlaceholder": "Valor",
+      "notePlaceholder": "Nota interna (ej. Referido de Juan)",
+      "add": "Agregar",
+      "noCodes": "Sin códigos aún.",
+      "deleteConfirm": "¿Eliminar este código?",
+      "errEmpty": "Ingresá un nombre para el código.",
+      "errExists": "El código ya existe.",
+      "errValue": "Ingresá un valor válido."
+    },
+    "prices": {
+      "title": "Precios de servicios",
+      "subtitle": "Editá los precios de todos los servicios",
+      "save": "Guardar cambios",
+      "saved": "¡Guardado!"
+    }
+  }
+}

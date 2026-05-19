@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --ck-violet: #A601F1;
+    --ck-dark: #1D2E56;
+    --ck-blue: #36A9E1;
+  }
+
+  body {
+    background: #f4f6fb;
+    color: #1D2E56;
+    font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .pnl {
+    @apply bg-white border border-[rgba(29,46,86,0.12)] rounded-[10px] p-[14px];
+  }
+
+  .ck-section-label {
+    @apply flex items-center gap-1.5 text-[11px] font-medium text-[#36A9E1] uppercase tracking-[0.08em]
+           pb-[7px] mt-[18px] mb-[9px] border-b border-[rgba(54,169,225,0.22)];
+  }
+
+  .ck-pkg-card {
+    @apply border border-[rgba(29,46,86,0.15)] rounded-[10px] p-[11px]
+           cursor-pointer bg-white transition-colors
+           hover:border-[#A601F1];
+  }
+
+  .ck-pkg-card.active {
+    @apply border-2 border-[#A601F1] bg-[rgba(166,1,241,0.04)];
+  }
+
+  .ck-row {
+    @apply flex items-center gap-[7px] px-[9px] py-2
+           border border-[rgba(29,46,86,0.12)] rounded-[7px]
+           cursor-pointer bg-white transition-colors mb-1
+           hover:border-[rgba(166,1,241,0.35)];
+  }
+
+  .ck-row.active {
+    @apply border-[#A601F1] bg-[rgba(166,1,241,0.05)];
+  }
+
+  .ck-checkbox {
+    @apply w-[14px] h-[14px] border-[1.5px] border-[rgba(29,46,86,0.25)]
+           rounded-[3px] flex-shrink-0 flex items-center justify-center
+           text-[8px] text-transparent;
+  }
+
+  .ck-checkbox.checked {
+    @apply bg-[#A601F1] border-[#A601F1] text-white;
+  }
+
+  .ck-plan-btn {
+    @apply border border-[rgba(29,46,86,0.2)] rounded-[7px] px-1 py-[6px]
+           text-[11px] bg-white text-[#1D2E56] flex-1 text-center font-medium
+           cursor-pointer hover:border-[#A601F1] transition-colors;
+  }
+
+  .ck-plan-btn.active {
+    @apply border-[#A601F1] text-[#A601F1] bg-[rgba(166,1,241,0.06)];
+  }
+
+  .ck-input {
+    @apply border border-[rgba(29,46,86,0.2)] rounded-[7px] px-[9px] py-[7px]
+           text-[13px] bg-white text-[#1D2E56] w-full mb-[7px]
+           focus:outline-none focus:border-[#A601F1] transition-colors;
+    font-family: var(--font-poppins), sans-serif;
+  }
+
+  .ck-tag {
+    @apply text-[10px] px-[7px] py-[2px] rounded-[4px] inline-block;
+  }
+}
