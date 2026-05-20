@@ -11,6 +11,8 @@
     "company": "Negocio / empresa",
     "email": "Correo electrónico",
     "phone": "Teléfono / WhatsApp",
+    "abn": "ABN / ACN (opcional)",
+    "address": "Dirección del negocio (opcional)",
     "invalidEmail": "Ingresá un correo electrónico válido"
   },
   "project": {

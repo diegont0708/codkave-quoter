@@ -60,6 +60,8 @@ export interface QuoteState {
   clientCompany: string;
   clientEmail: string;
   clientPhone: string;
+  clientAbn: string;
+  clientAddress: string;
   projectName: string;
   timeline: string;
   notes: string;

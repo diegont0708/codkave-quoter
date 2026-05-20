@@ -16,6 +16,8 @@ export async function POST(req: NextRequest) {
         client_company:   client.company || null,
         client_email:     client.email,
         client_phone:     client.phone   || null,
+        client_abn:       client.abn     || null,
+        client_address:   client.address || null,
         channel,
         subtotal:         quote.subtotal,
         discount:         quote.discount,

@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS quotes (
   client_company    TEXT,
   client_email      TEXT NOT NULL,
   client_phone      TEXT,
+  client_abn        TEXT,
+  client_address    TEXT,
   channel           TEXT DEFAULT 'presencial' CHECK (channel IN ('presencial', 'web')),
   subtotal          NUMERIC(10,2) NOT NULL DEFAULT 0,
   discount          NUMERIC(10,2) DEFAULT 0,

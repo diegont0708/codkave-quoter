@@ -21,7 +21,7 @@ export default function Quoter({ promoCodes }: QuoterProps) {
   const [state, setState] = useState<QuoteState>({
     packageId: null,
     addonIds: new Set(),
-    maintenanceId: null,
+    maintenanceId: 'ess',
     extraIds: new Set(),
     paymentPlan: 'full',
     instalmentMonths: 3,
@@ -29,6 +29,8 @@ export default function Quoter({ promoCodes }: QuoterProps) {
     clientCompany: '',
     clientEmail: '',
     clientPhone: '',
+    clientAbn: '',
+    clientAddress: '',
     projectName: '',
     timeline: '',
     notes: '',
@@ -142,7 +144,7 @@ export default function Quoter({ promoCodes }: QuoterProps) {
   <td style="vertical-align:top;padding-left:20px">
     <div style="font-size:9px;font-weight:700;color:#A601F1;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;padding-bottom:6px;margin-bottom:10px;border-bottom:1px solid #A601F1">Prepared For</div>
     ${state.clientName ? `<div style="font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;margin-bottom:4px">${state.clientName}</div>` : ''}
-    <div style="font-size:12px;color:#666;font-family:Arial,sans-serif;line-height:1.7">${[state.clientCompany, state.clientEmail, state.clientPhone].filter(Boolean).join('<br>')}</div>
+    <div style="font-size:12px;color:#666;font-family:Arial,sans-serif;line-height:1.7">${[state.clientCompany, state.clientAbn, state.clientAddress, state.clientEmail, state.clientPhone].filter(Boolean).join('<br>')}</div>
   </td>
 </tr></table></td></tr>
 <tr><td style="padding:0 40px 20px"><table style="width:100%;border-collapse:collapse">
@@ -321,6 +323,8 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
           company: state.clientCompany,
           email:   state.clientEmail,
           phone:   state.clientPhone,
+          abn:     state.clientAbn,
+          address: state.clientAddress,
         },
         quote: {
           items: items.map(i => ({ name: i.name, price: i.price, recurring: i.isMonthly, estimated: i.isEstimated })),
@@ -391,6 +395,10 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
               onChange={e => setState(s => ({ ...s, clientCompany: e.target.value }))} />
             <input className="ck-input" placeholder={t('client.phone')} type="tel" value={state.clientPhone}
               onChange={e => setState(s => ({ ...s, clientPhone: e.target.value }))} />
+            <input className="ck-input" placeholder={t('client.abn')} value={state.clientAbn}
+              onChange={e => setState(s => ({ ...s, clientAbn: e.target.value }))} />
+            <input className="ck-input" placeholder={t('client.address')} value={state.clientAddress}
+              onChange={e => setState(s => ({ ...s, clientAddress: e.target.value }))} />
             <input
               className={`ck-input ${emailError ? '!border-[#e57373] !mb-1' : '!mb-0'}`}
               placeholder={t('client.email')}

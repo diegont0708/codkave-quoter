@@ -11,6 +11,8 @@
     "company": "Business / company",
     "email": "Email address",
     "phone": "Phone / WhatsApp",
+    "abn": "ABN / ACN (optional)",
+    "address": "Business address (optional)",
     "invalidEmail": "Please enter a valid email address"
   },
   "project": {
