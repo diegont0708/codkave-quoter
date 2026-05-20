@@ -4,30 +4,32 @@ import { createClient } from '@/lib/supabase/server';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { client, quote, sent_at } = body;
+    const { channel = 'presencial', client, quote, pdf_base64, sent_at } = body;
 
     const supabase = await createClient();
 
-    // Save quote to Supabase
+    // ── Save quote to Supabase ─────────────────────────────────────────────────
     const { data: savedQuote, error: quoteError } = await supabase
       .from('quotes')
       .insert({
-        client_name: client.name || null,
-        client_company: client.company || null,
-        client_email: client.email,
-        subtotal: quote.subtotal,
-        discount: quote.discount,
-        total_onetime: quote.total_onetime,
-        total_monthly: quote.total_monthly,
-        payment_plan: quote.payment_plan,
-        instalment_months: quote.instalment_months,
-        instalment_amount: quote.instalment_amount,
-        deposit_35: quote.deposit_35,
-        payment_35: quote.payment_35,
-        balance: quote.balance,
-        promo_code: quote.promo_code,
-        status: 'sent',
-        webhook_sent_at: sent_at,
+        client_name:      client.name    || null,
+        client_company:   client.company || null,
+        client_email:     client.email,
+        client_phone:     client.phone   || null,
+        channel,
+        subtotal:         quote.subtotal,
+        discount:         quote.discount,
+        total_onetime:    quote.total_onetime,
+        total_monthly:    quote.total_monthly,
+        payment_plan:     quote.payment_plan,
+        instalment_months:quote.instalment_months,
+        instalment_amount:quote.instalment_amount,
+        deposit_35:       quote.deposit_35,
+        payment_35:       quote.payment_35,
+        balance:          quote.balance_30,
+        promo_code:       quote.promo_code,
+        status:           'sent',
+        webhook_sent_at:  sent_at,
       })
       .select()
       .single();
@@ -36,28 +38,35 @@ export async function POST(req: NextRequest) {
       console.error('Quote insert error:', quoteError);
     }
 
-    // Save quote items
+    // ── Save quote items ───────────────────────────────────────────────────────
     if (savedQuote && quote.items?.length) {
       await supabase.from('quote_items').insert(
         quote.items.map((item: { name: string; price: number; recurring: boolean; estimated: boolean }, idx: number) => ({
-          quote_id: savedQuote.id,
-          item_id: `item_${idx}`,
-          name: item.name,
-          price: item.price,
-          is_monthly: item.recurring,
+          quote_id:     savedQuote.id,
+          item_id:      `item_${idx}`,
+          name:         item.name,
+          price:        item.price,
+          is_monthly:   item.recurring,
           is_estimated: item.estimated,
-          sort_order: idx,
+          sort_order:   idx,
         }))
       );
     }
 
-    // Fire n8n webhook
+    // ── Fire n8n webhook (full payload including pdf_base64) ───────────────────
     const webhookUrl = process.env.N8N_WEBHOOK_URL;
     if (webhookUrl) {
       await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client, quote, sent_at, quote_id: savedQuote?.id }),
+        body: JSON.stringify({
+          channel,
+          client,
+          quote,
+          pdf_base64: pdf_base64 ?? null,
+          sent_at,
+          quote_id: savedQuote?.id ?? null,
+        }),
       }).catch(err => console.error('Webhook error:', err));
     }
 

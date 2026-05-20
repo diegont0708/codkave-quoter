@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -28,6 +28,7 @@ export default function Quoter({ promoCodes }: QuoterProps) {
     clientName: '',
     clientCompany: '',
     clientEmail: '',
+    clientPhone: '',
     projectName: '',
     timeline: '',
     notes: '',
@@ -86,10 +87,9 @@ export default function Quoter({ promoCodes }: QuoterProps) {
   };
 
   // ─── PDF Generation ─────────────────────────────────────────────────────────
-  const generatePDF = async () => {
-    if (!hasItems) return;
+  const [pdfStatus, setPdfStatus] = useState<'idle' | 'loading' | 'error'>('idle');
 
-    // Load logo as base64 so it renders correctly inside the iframe
+  const buildPDFBlob = async (): Promise<Blob> => {
     const logoDataUrl = await fetch('/Logotipo Codkave.png')
       .then(r => r.blob())
       .then(b => new Promise<string>((resolve, reject) => {
@@ -107,78 +107,58 @@ export default function Quoter({ promoCodes }: QuoterProps) {
     const moItems = items.filter(i => i.isMonthly);
     const fAUD = formatAUD;
     const rate = state.instalmentMonths === 3 ? 5 : 8;
-
     const quoteNumber = `CK-${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
     const paymentTermsLabel = state.paymentPlan === 'full' ? '35% · 35% · 30%' : `35% deposit + ${state.instalmentMonths}-mo plan`;
 
     const thStyle = `padding:9px 14px;font-size:9px;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:1.5px;font-family:Arial,sans-serif;font-weight:700;text-align:left`;
-    const sectionLabel = (text: string) => `<div style="font-size:9px;font-weight:700;color:#A601F1;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;margin-bottom:8px">${text}</div>`;
+    const secLabel = (t: string) => `<div style="font-size:9px;font-weight:700;color:#A601F1;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;margin-bottom:8px">${t}</div>`;
     const tcRow = (label: string, text: string) => `<tr><td style="padding:12px 16px;font-size:12px;font-weight:700;color:#A601F1;font-family:Arial,sans-serif;vertical-align:top;width:140px;border-bottom:1px solid #eee">${label}</td><td style="padding:12px 16px;font-size:12px;color:#555;font-family:Arial,sans-serif;line-height:1.6;border-bottom:1px solid #eee">${text}</td></tr>`;
-
     const paymentTcText = state.paymentPlan === 'full'
-      ? `A deposit of 35% is required to commence work. A second payment of 35% is due upon design review completion. The remaining 30% balance is due upon final project delivery.`
-      : `A deposit of 35% is required to commence work. A second payment of 35% is due upon design review completion. The remaining 30% will be financed over ${state.instalmentMonths} months at ${rate}% interest via automatic direct debit through GoCardless.`;
+      ? `A deposit of 35% is required to commence work. A second payment of 35% is due upon design review. The remaining 30% is due upon final delivery.`
+      : `A deposit of 35% is required to commence work. A second payment of 35% is due upon design review. The remaining 30% will be financed over ${state.instalmentMonths} months at ${rate}% interest via automatic direct debit.`;
 
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
 <style>body{margin:0;padding:0;background:#fff;font-family:Arial,sans-serif}table{border-collapse:collapse;width:100%}</style>
-</head><body>
-<table style="width:595px;background:#fff">
-
-<!-- ── HEADER ─────────────────────────────────────────────── -->
-<tr><td style="padding:32px 40px 24px">
-  <table style="width:100%"><tr>
-    <td style="vertical-align:top">
-      ${logoDataUrl ? `<img src="${logoDataUrl}" style="height:48px;display:block;margin-bottom:6px" />` : `<span style="font-family:'Arial Black',Arial,sans-serif;font-size:26px;font-weight:900;color:#A601F1;letter-spacing:-1px">CodKave</span>`}
-      <div style="font-size:11px;color:#aaa;font-family:Arial,sans-serif;margin-top:4px">codkave.com</div>
-    </td>
-    <td style="text-align:right;vertical-align:top">
-      <div style="font-size:9px;font-weight:700;color:#A601F1;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;margin-bottom:4px">Service Quotation</div>
-      <div style="font-size:22px;font-weight:700;color:#1D2E56;font-family:'Arial Black',Arial,sans-serif;letter-spacing:-0.5px">${quoteNumber}</div>
-      <div style="font-size:11px;color:#888;font-family:Arial,sans-serif;margin-top:4px">Issued: ${formatDate(now)}</div>
-      <div style="font-size:11px;color:#888;font-family:Arial,sans-serif">Valid until: ${formatDateTime(exp)}</div>
-    </td>
-  </tr></table>
-</td></tr>
-
-<!-- ── DIVIDER ────────────────────────────────────────────── -->
+</head><body><table style="width:595px;background:#fff">
+<tr><td style="padding:32px 40px 24px"><table style="width:100%"><tr>
+  <td style="vertical-align:top">
+    ${logoDataUrl ? `<img src="${logoDataUrl}" style="height:48px;display:block;margin-bottom:4px"/>` : `<span style="font-family:'Arial Black',Arial,sans-serif;font-size:26px;font-weight:900;color:#A601F1">CodKave</span>`}
+    <div style="font-size:11px;color:#aaa;font-family:Arial,sans-serif;margin-top:4px">codkave.com</div>
+  </td>
+  <td style="text-align:right;vertical-align:top">
+    <div style="font-size:9px;font-weight:700;color:#A601F1;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;margin-bottom:4px">Service Quotation</div>
+    <div style="font-size:22px;font-weight:700;color:#1D2E56;font-family:'Arial Black',Arial,sans-serif">${quoteNumber}</div>
+    <div style="font-size:11px;color:#888;font-family:Arial,sans-serif;margin-top:4px">Issued: ${formatDate(now)}</div>
+    <div style="font-size:11px;color:#888;font-family:Arial,sans-serif">Valid until: ${formatDateTime(exp)}</div>
+  </td>
+</tr></table></td></tr>
 <tr><td style="padding:0 40px"><div style="height:2px;background:#1D2E56"></div></td></tr>
-
-<!-- ── FROM / PREPARED FOR ───────────────────────────────── -->
-<tr><td style="padding:24px 40px">
-  <table style="width:100%"><tr>
-    <td style="vertical-align:top;width:50%;padding-right:20px">
-      <div style="font-size:9px;font-weight:700;color:#1D2E56;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;padding-bottom:6px;margin-bottom:10px;border-bottom:1px solid #1D2E56">From</div>
-      <div style="font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;margin-bottom:4px">Diego Nunez Triana</div>
-      <div style="font-size:12px;color:#666;font-family:Arial,sans-serif;line-height:1.7">Codkave<br>ABN 54 850 905 499<br>info@codkave.com<br>0424 009 654<br>codkave.com</div>
-    </td>
-    <td style="vertical-align:top;padding-left:20px">
-      <div style="font-size:9px;font-weight:700;color:#A601F1;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;padding-bottom:6px;margin-bottom:10px;border-bottom:1px solid #A601F1">Prepared For</div>
-      ${state.clientName ? `<div style="font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;margin-bottom:4px">${state.clientName}</div>` : ''}
-      <div style="font-size:12px;color:#666;font-family:Arial,sans-serif;line-height:1.7">${[state.clientCompany, state.clientEmail].filter(Boolean).join('<br>')}</div>
-    </td>
-  </tr></table>
-</td></tr>
-
-<!-- ── PROJECT / TIMELINE / PAYMENT TERMS ────────────────── -->
-<tr><td style="padding:0 40px 20px">
-  <table style="width:100%;border-collapse:collapse">
-    <tr style="background:#1D2E56">
-      <th style="${thStyle};width:34%">Project</th>
-      <th style="${thStyle};width:33%">Estimated Timeline</th>
-      <th style="${thStyle};width:33%">Payment Terms</th>
-    </tr>
-    <tr style="background:#f7f8fb">
-      <td style="padding:11px 14px;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${state.projectName || '—'}</td>
-      <td style="padding:11px 14px;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${state.timeline || '—'}</td>
-      <td style="padding:11px 14px;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${paymentTermsLabel}</td>
-    </tr>
-  </table>
-</td></tr>
-
-<!-- ── SERVICES & DELIVERABLES ───────────────────────────── -->
-${otItems.length ? `
-<tr><td style="padding:4px 40px 0">
-  ${sectionLabel('Services &amp; Deliverables')}
+<tr><td style="padding:24px 40px"><table style="width:100%"><tr>
+  <td style="vertical-align:top;width:50%;padding-right:20px">
+    <div style="font-size:9px;font-weight:700;color:#1D2E56;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;padding-bottom:6px;margin-bottom:10px;border-bottom:1px solid #1D2E56">From</div>
+    <div style="font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;margin-bottom:4px">Diego Nunez Triana</div>
+    <div style="font-size:12px;color:#666;font-family:Arial,sans-serif;line-height:1.7">Codkave<br>ABN 54 850 905 499<br>info@codkave.com<br>0424 009 654<br>codkave.com</div>
+  </td>
+  <td style="vertical-align:top;padding-left:20px">
+    <div style="font-size:9px;font-weight:700;color:#A601F1;text-transform:uppercase;letter-spacing:2px;font-family:Arial,sans-serif;padding-bottom:6px;margin-bottom:10px;border-bottom:1px solid #A601F1">Prepared For</div>
+    ${state.clientName ? `<div style="font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;margin-bottom:4px">${state.clientName}</div>` : ''}
+    <div style="font-size:12px;color:#666;font-family:Arial,sans-serif;line-height:1.7">${[state.clientCompany, state.clientEmail, state.clientPhone].filter(Boolean).join('<br>')}</div>
+  </td>
+</tr></table></td></tr>
+<tr><td style="padding:0 40px 20px"><table style="width:100%;border-collapse:collapse">
+  <tr style="background:#1D2E56">
+    <th style="${thStyle};width:34%">Project</th>
+    <th style="${thStyle};width:33%">Estimated Timeline</th>
+    <th style="${thStyle};width:33%">Payment Terms</th>
+  </tr>
+  <tr style="background:#f7f8fb">
+    <td style="padding:11px 14px;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${state.projectName || '—'}</td>
+    <td style="padding:11px 14px;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${state.timeline || '—'}</td>
+    <td style="padding:11px 14px;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${paymentTermsLabel}</td>
+  </tr>
+</table></td></tr>
+${otItems.length ? `<tr><td style="padding:4px 40px 0">
+  ${secLabel('Services &amp; Deliverables')}
   <table style="width:100%;border-collapse:collapse">
     <tr style="background:#1D2E56">
       <th style="${thStyle};width:28px;text-align:center">#</th>
@@ -187,34 +167,29 @@ ${otItems.length ? `
       <th style="${thStyle};width:90px;text-align:right">Unit Price</th>
       <th style="${thStyle};width:90px;text-align:right">Amount</th>
     </tr>
-    ${otItems.map((it, i) => `
-    <tr style="background:${i%2===0?'#fff':'#f7f8fb'}">
+    ${otItems.map((it, i) => `<tr style="background:${i%2===0?'#fff':'#f7f8fb'}">
       <td style="padding:11px 10px;text-align:center;font-size:11px;color:#bbb;font-family:Arial,sans-serif">${String(i+1).padStart(2,'0')}</td>
-      <td style="padding:11px 14px;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${it.name}${it.isEstimated ? '<br><span style="font-size:10px;font-weight:400;color:#aaa">Estimated price</span>' : ''}</td>
+      <td style="padding:11px 14px;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${it.name}${it.isEstimated?'<br><span style="font-size:10px;font-weight:400;color:#aaa">Estimated price</span>':''}</td>
       <td style="padding:11px 10px;text-align:center;font-size:13px;color:#555;font-family:Arial,sans-serif">1</td>
       <td style="padding:11px 14px;text-align:right;font-size:13px;color:#555;font-family:Arial,sans-serif">${it.price===0?'Free':fAUD(it.price)}</td>
       <td style="padding:11px 14px;text-align:right;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${it.price===0?'Free':fAUD(it.price)}</td>
     </tr>`).join('')}
-    ${discount>0 ? `<tr style="background:#e8f5e9">
+    ${discount>0?`<tr style="background:#e8f5e9">
       <td style="padding:9px 10px;text-align:center;font-size:11px;color:#2e7d32;font-family:Arial,sans-serif">—</td>
       <td colspan="3" style="padding:9px 14px;font-size:13px;color:#2e7d32;font-family:Arial,sans-serif;font-weight:500">Promotional discount</td>
       <td style="padding:9px 14px;text-align:right;font-weight:700;color:#2e7d32;font-family:Arial,sans-serif;font-size:13px">-${fAUD(discount)}</td>
-    </tr>` : ''}
+    </tr>`:''}
   </table>
 </td></tr>` : ''}
-
-<!-- ── RECURRING SERVICES ─────────────────────────────────── -->
-${moItems.length ? `
-<tr><td style="padding:16px 40px 0">
-  ${sectionLabel('Recurring Services')}
+${moItems.length ? `<tr><td style="padding:16px 40px 0">
+  ${secLabel('Recurring Services')}
   <table style="width:100%;border-collapse:collapse">
     <tr style="background:#1D2E56">
       <th style="${thStyle};width:28px;text-align:center">#</th>
       <th style="${thStyle}">Description</th>
       <th style="${thStyle};width:100px;text-align:right">Monthly</th>
     </tr>
-    ${moItems.map((it, i) => `
-    <tr style="background:${i%2===0?'#fff':'#f7f8fb'}">
+    ${moItems.map((it, i) => `<tr style="background:${i%2===0?'#fff':'#f7f8fb'}">
       <td style="padding:11px 10px;text-align:center;font-size:11px;color:#bbb;font-family:Arial,sans-serif">${String(i+1).padStart(2,'0')}</td>
       <td style="padding:11px 14px;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${it.name}</td>
       <td style="padding:11px 14px;text-align:right;font-size:13px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">${fAUD(it.price)}/mo</td>
@@ -225,27 +200,17 @@ ${moItems.length ? `
     </tr>
   </table>
 </td></tr>` : ''}
-
-<!-- ── TOTALS ─────────────────────────────────────────────── -->
-${otItems.length ? `
-<tr><td style="padding:16px 40px 0">
-  <table style="width:100%;border-collapse:collapse">
-    <tr><td style="padding:6px 14px;text-align:right;font-size:12px;color:#888;font-family:Arial,sans-serif">Subtotal</td>
-        <td style="padding:6px 14px;text-align:right;font-size:12px;color:#888;font-family:Arial,sans-serif;width:130px">${fAUD(net + discount)}</td></tr>
-    <tr><td style="padding:6px 14px;text-align:right;font-size:12px;color:#888;font-family:Arial,sans-serif">GST (0% — not registered)</td>
-        <td style="padding:6px 14px;text-align:right;font-size:12px;color:#888;font-family:Arial,sans-serif">$0.00</td></tr>
-    ${discount>0 ? `<tr><td style="padding:6px 14px;text-align:right;font-size:12px;color:#2e7d32;font-family:Arial,sans-serif">Discount</td>
-        <td style="padding:6px 14px;text-align:right;font-size:12px;color:#2e7d32;font-family:Arial,sans-serif">-${fAUD(discount)}</td></tr>` : ''}
-    <tr style="background:#A601F1">
-      <td style="padding:13px 14px;text-align:right;font-size:14px;font-weight:700;color:#fff;font-family:Arial,sans-serif">TOTAL (AUD)</td>
-      <td style="padding:13px 14px;text-align:right;font-size:16px;font-weight:700;color:#fff;font-family:Arial,sans-serif">${fAUD(net)}</td>
-    </tr>
-  </table>
-</td></tr>` : ''}
-
-<!-- ── PAYMENT SCHEDULE ───────────────────────────────────── -->
+${otItems.length ? `<tr><td style="padding:16px 40px 0"><table style="width:100%;border-collapse:collapse">
+  <tr><td style="padding:6px 14px;text-align:right;font-size:12px;color:#888;font-family:Arial,sans-serif">Subtotal</td><td style="padding:6px 14px;text-align:right;font-size:12px;color:#888;font-family:Arial,sans-serif;width:130px">${fAUD(net+discount)}</td></tr>
+  <tr><td style="padding:6px 14px;text-align:right;font-size:12px;color:#888;font-family:Arial,sans-serif">GST (0% — not registered)</td><td style="padding:6px 14px;text-align:right;font-size:12px;color:#888;font-family:Arial,sans-serif">$0.00</td></tr>
+  ${discount>0?`<tr><td style="padding:6px 14px;text-align:right;font-size:12px;color:#2e7d32;font-family:Arial,sans-serif">Discount</td><td style="padding:6px 14px;text-align:right;font-size:12px;color:#2e7d32;font-family:Arial,sans-serif">-${fAUD(discount)}</td></tr>`:''}
+  <tr style="background:#A601F1">
+    <td style="padding:13px 14px;text-align:right;font-size:14px;font-weight:700;color:#fff;font-family:Arial,sans-serif">TOTAL (AUD)</td>
+    <td style="padding:13px 14px;text-align:right;font-size:16px;font-weight:700;color:#fff;font-family:Arial,sans-serif">${fAUD(net)}</td>
+  </tr>
+</table></td></tr>` : ''}
 <tr><td style="padding:20px 40px 0">
-  ${sectionLabel('Payment Schedule')}
+  ${secLabel('Payment Schedule')}
   <table style="width:100%;border-collapse:collapse;background:#f5f3fb;border-left:3px solid #A601F1">
     ${state.paymentPlan === 'full' ? `
     <tr><td style="padding:10px 16px;font-size:13px;color:#555;font-family:Arial,sans-serif;border-bottom:1px solid #e8e0f7">Contract signing (35%)</td><td style="padding:10px 16px;text-align:right;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;font-size:13px">${fAUD(deposit35)}</td></tr>
@@ -255,71 +220,48 @@ ${otItems.length ? `
     ` : `
     <tr><td style="padding:10px 16px;font-size:13px;color:#555;font-family:Arial,sans-serif;border-bottom:1px solid #e8e0f7">Contract signing (35%)</td><td style="padding:10px 16px;text-align:right;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;font-size:13px">${fAUD(deposit35)}</td></tr>
     <tr><td style="padding:10px 16px;font-size:13px;color:#555;font-family:Arial,sans-serif;border-bottom:1px solid #e8e0f7">Design review (35%)</td><td style="padding:10px 16px;text-align:right;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;font-size:13px">${fAUD(payment35)}</td></tr>
-    <tr><td style="padding:10px 16px;font-size:13px;color:#555;font-family:Arial,sans-serif;border-bottom:1px solid #e8e0f7">Balance financed (30% + ${rate}% interest)</td><td style="padding:10px 16px;text-align:right;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;font-size:13px">${fAUD(instalment * state.instalmentMonths)}</td></tr>
-    <tr style="background:#ede8fb"><td style="padding:11px 16px;font-size:14px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">Monthly project instalment</td><td style="padding:11px 16px;text-align:right;font-weight:700;color:#A601F1;font-family:Arial,sans-serif;font-size:14px">${fAUD(instalment)}/mo × ${state.instalmentMonths} months</td></tr>
-    ${calc.monthly > 0 ? `<tr style="background:#ede8fb"><td style="padding:11px 16px;font-size:14px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;border-top:1px solid #d8cff5">Total monthly direct debit</td><td style="padding:11px 16px;text-align:right;font-weight:700;color:#A601F1;font-family:Arial,sans-serif;font-size:14px">${fAUD(instalment + calc.monthly)}/mo</td></tr>` : ''}
+    <tr><td style="padding:10px 16px;font-size:13px;color:#555;font-family:Arial,sans-serif;border-bottom:1px solid #e8e0f7">Balance financed (30% + ${rate}% interest)</td><td style="padding:10px 16px;text-align:right;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;font-size:13px">${fAUD(instalment*state.instalmentMonths)}</td></tr>
+    <tr style="background:#ede8fb"><td style="padding:11px 16px;font-size:14px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">Monthly instalment</td><td style="padding:11px 16px;text-align:right;font-weight:700;color:#A601F1;font-family:Arial,sans-serif;font-size:14px">${fAUD(instalment)}/mo × ${state.instalmentMonths}</td></tr>
+    ${calc.monthly>0?`<tr style="background:#ede8fb"><td style="padding:11px 16px;font-size:14px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;border-top:1px solid #d8cff5">Total monthly direct debit</td><td style="padding:11px 16px;text-align:right;font-weight:700;color:#A601F1;font-family:Arial,sans-serif;font-size:14px">${fAUD(instalment+calc.monthly)}/mo</td></tr>`:''}
     <tr><td colspan="2" style="padding:8px 16px;font-size:11px;color:#aaa;font-family:Arial,sans-serif">Automatic debit via GoCardless · Hosted on CodKave servers</td></tr>
     `}
   </table>
 </td></tr>
-
-<!-- ── TERMS & CONDITIONS ─────────────────────────────────── -->
 <tr><td style="padding:28px 40px 0">
   <div style="height:2px;background:#1D2E56;margin-bottom:20px"></div>
-  ${sectionLabel('Terms &amp; Conditions')}
+  ${secLabel('Terms &amp; Conditions')}
   <table style="width:100%;border-collapse:collapse;border:1px solid #eee">
     ${tcRow('Payment', paymentTcText)}
     ${tcRow('Validity', 'This quotation is valid for 48 hours from the issue date. Prices may be subject to change after this period.')}
-    ${tcRow('Revisions', 'This quotation includes up to 2 rounds of revisions within the agreed scope. Additional changes outside the agreed scope will be quoted separately.')}
-    ${tcRow('Intellectual property', 'Full ownership of all deliverables transfers to the client upon receipt of final payment. Codkave retains the right to display the work in its portfolio unless otherwise agreed in writing.')}
-    ${tcRow('Confidentiality', 'Both parties agree to keep all project details, business information, and technical specifications confidential during and after the engagement.')}
+    ${tcRow('Revisions', 'This quotation includes up to 2 rounds of revisions within the agreed scope. Additional changes will be quoted separately.')}
+    ${tcRow('Intellectual property', 'Full ownership of deliverables transfers to the client upon receipt of final payment. Codkave retains the right to display the work in its portfolio unless otherwise agreed.')}
+    ${tcRow('Confidentiality', 'Both parties agree to keep all project details and business information confidential during and after the engagement.')}
     ${tcRow('Cancellation', 'If the project is cancelled after work has commenced, the deposit is non-refundable. Any completed work beyond the deposit value will be invoiced accordingly.')}
   </table>
 </td></tr>
-
-<!-- ── NOTES ─────────────────────────────────────────────── -->
-${state.notes ? `
-<tr><td style="padding:20px 40px 0">
-  ${sectionLabel('Notes')}
+${state.notes ? `<tr><td style="padding:20px 40px 0">
+  ${secLabel('Notes')}
   <p style="font-size:12px;color:#555;font-family:Arial,sans-serif;margin:0;line-height:1.7">${state.notes}</p>
 </td></tr>` : ''}
-
-<!-- ── FOOTER ─────────────────────────────────────────────── -->
-<tr><td style="padding:28px 40px;border-top:2px solid #1D2E56;margin-top:20px">
-  <table style="width:100%"><tr>
-    <td style="font-size:11px;font-weight:700;color:#1D2E56;font-family:'Arial Black',Arial,sans-serif;vertical-align:middle">CODKAVE</td>
-    <td style="text-align:right;font-size:11px;color:#888;font-family:Arial,sans-serif;vertical-align:middle">Diego Nunez Triana &nbsp;·&nbsp; ABN 54 850 905 499 &nbsp;·&nbsp; info@codkave.com &nbsp;·&nbsp; 0424 009 654</td>
-  </tr></table>
-</td></tr>
-
+<tr><td style="padding:28px 40px;border-top:2px solid #1D2E56;margin-top:20px"><table style="width:100%"><tr>
+  <td style="font-size:11px;font-weight:700;color:#1D2E56;font-family:'Arial Black',Arial,sans-serif;vertical-align:middle">CODKAVE</td>
+  <td style="text-align:right;font-size:11px;color:#888;font-family:Arial,sans-serif;vertical-align:middle">Diego Nunez Triana &nbsp;·&nbsp; ABN 54 850 905 499 &nbsp;·&nbsp; info@codkave.com &nbsp;·&nbsp; 0424 009 654</td>
+</tr></table></td></tr>
 </table></body></html>`;
 
-    // Use iframe so the full HTML document (with <head>/<style>) renders correctly
     const iframe = document.createElement('iframe');
     iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:620px;height:900px;border:none;visibility:hidden';
     document.body.appendChild(iframe);
-
     const iframeDoc = iframe.contentDocument ?? iframe.contentWindow?.document;
-    if (!iframeDoc) { document.body.removeChild(iframe); return; }
-
-    iframeDoc.open();
-    iframeDoc.write(html);
-    iframeDoc.close();
-
+    if (!iframeDoc) { document.body.removeChild(iframe); throw new Error('iframe error'); }
+    iframeDoc.open(); iframeDoc.write(html); iframeDoc.close();
     await new Promise(r => setTimeout(r, 400));
-
     const target = iframeDoc.body?.firstElementChild as HTMLElement | null;
-    if (!target) { document.body.removeChild(iframe); return; }
-
+    if (!target) { document.body.removeChild(iframe); throw new Error('no target'); }
     const { default: html2canvas } = await import('html2canvas');
-    const canvas = await html2canvas(target, {
-      scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', windowWidth: 620,
-    });
-
+    const canvas = await html2canvas(target, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', windowWidth: 620 });
     document.body.removeChild(iframe);
-
-    if (!canvas || canvas.width === 0) return;
-
+    if (!canvas || canvas.width === 0) throw new Error('canvas error');
     const { jsPDF } = await import('jspdf');
     const pdf = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' });
     const pageW = pdf.internal.pageSize.getWidth();
@@ -327,22 +269,32 @@ ${state.notes ? `
     const imgW = pageW;
     const imgH = (canvas.height * imgW) / canvas.width;
     const imgData = canvas.toDataURL('image/jpeg', 0.99);
-
-    let heightLeft = imgH;
-    let pos = 0;
+    let heightLeft = imgH; let pos = 0;
     pdf.addImage(imgData, 'JPEG', 0, pos, imgW, imgH);
     heightLeft -= pageH;
-
-    while (heightLeft > 0) {
-      pos -= pageH;
-      pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, pos, imgW, imgH);
-      heightLeft -= pageH;
-    }
-
-    const slug = (state.clientName || 'quote').replace(/\s+/g, '-').toLowerCase();
-    pdf.save(`CodKave-${slug}-${now.toISOString().slice(0, 10)}.pdf`);
+    while (heightLeft > 0) { pos -= pageH; pdf.addPage(); pdf.addImage(imgData, 'JPEG', 0, pos, imgW, imgH); heightLeft -= pageH; }
+    return pdf.output('blob');
   };
+
+  const generatePDF = async () => {
+    if (!hasItems || pdfStatus === 'loading') return;
+    setPdfStatus('loading');
+    try {
+      const blob = await buildPDFBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CodKave-${(state.clientName || 'quote').replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setPdfStatus('idle');
+    } catch (err) {
+      console.error('[generatePDF]', err);
+      setPdfStatus('error');
+      setTimeout(() => setPdfStatus('idle'), 3000);
+    }
+  };
+
 
   // ─── Send to Client ──────────────────────────────────────────────────────────
   const sendToClient = async () => {
@@ -352,26 +304,42 @@ ${state.notes ? `
     const { net, discount, monthly } = calc;
     const { deposit35, payment35, balance, instalment } = payments;
 
-    const payload = {
-      client: { name: state.clientName, company: state.clientCompany, email: state.clientEmail },
-      quote: {
-        items: items.map(i => ({ name: i.name, price: i.price, recurring: i.isMonthly, estimated: i.isEstimated })),
-        subtotal: net + discount,
-        discount,
-        total_onetime: net,
-        total_monthly: monthly,
-        payment_plan: state.paymentPlan,
-        instalment_months: state.paymentPlan === 'inst' ? state.instalmentMonths : null,
-        instalment_amount: state.paymentPlan === 'inst' ? instalment : null,
-        deposit_35: deposit35,
-        payment_35: payment35,
-        balance,
-        promo_code: state.promoCode?.code ?? null,
-      },
-      sent_at: new Date().toISOString(),
-    };
-
     try {
+      // Generate PDF and encode as base64 for n8n
+      const pdfBlob = await buildPDFBlob();
+      const pdfBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve((reader.result as string).split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(pdfBlob);
+      });
+
+      const payload = {
+        channel: 'presencial',
+        client: {
+          name:    state.clientName,
+          company: state.clientCompany,
+          email:   state.clientEmail,
+          phone:   state.clientPhone,
+        },
+        quote: {
+          items: items.map(i => ({ name: i.name, price: i.price, recurring: i.isMonthly, estimated: i.isEstimated })),
+          subtotal:          net + discount,
+          discount,
+          total_onetime:     net,
+          total_monthly:     monthly,
+          payment_plan:      state.paymentPlan,
+          deposit_35:        deposit35,
+          payment_35:        payment35,
+          balance_30:        balance,
+          instalment_months: state.paymentPlan === 'inst' ? state.instalmentMonths : null,
+          instalment_amount: state.paymentPlan === 'inst' ? instalment : null,
+          promo_code:        state.promoCode?.code ?? null,
+        },
+        pdf_base64: pdfBase64,
+        sent_at:    new Date().toISOString(),
+      };
+
       const res = await fetch('/api/quotes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -421,6 +389,8 @@ ${state.notes ? `
               onChange={e => setState(s => ({ ...s, clientName: e.target.value }))} />
             <input className="ck-input" placeholder={t('client.company')} value={state.clientCompany}
               onChange={e => setState(s => ({ ...s, clientCompany: e.target.value }))} />
+            <input className="ck-input" placeholder={t('client.phone')} type="tel" value={state.clientPhone}
+              onChange={e => setState(s => ({ ...s, clientPhone: e.target.value }))} />
             <input
               className={`ck-input ${emailError ? '!border-[#e57373] !mb-1' : '!mb-0'}`}
               placeholder={t('client.email')}
@@ -701,10 +671,12 @@ ${state.notes ? `
           {/* Action buttons */}
           <button onClick={generatePDF} disabled={!hasItems}
             className={`w-full rounded-[9px] py-3 text-[13px] font-medium mb-1.5 flex items-center justify-center gap-1.5 transition-all border-none
-              ${hasItems
-                ? 'bg-gradient-to-br from-[#A601F1] to-[#7a00b8] text-white cursor-pointer shadow-[0_4px_12px_rgba(166,1,241,0.3)]'
-                : 'bg-[rgba(29,46,86,0.09)] text-[#bbb] cursor-default'}`}>
-            📄 {t('actions.downloadPdf')}
+              ${!hasItems || pdfStatus === 'loading'
+                ? 'bg-[rgba(29,46,86,0.09)] text-[#bbb] cursor-default'
+                : pdfStatus === 'error'
+                ? 'bg-[#e57373] text-white cursor-pointer'
+                : 'bg-gradient-to-br from-[#A601F1] to-[#7a00b8] text-white cursor-pointer shadow-[0_4px_12px_rgba(166,1,241,0.3)]'}`}>
+            {pdfStatus === 'loading' ? '⏳ Generating PDF…' : pdfStatus === 'error' ? '❌ Error — try again' : `📄 ${t('actions.downloadPdf')}`}
           </button>
 
           <button onClick={sendToClient} disabled={!canSend || sendStatus === 'sending'}

@@ -10,6 +10,7 @@
     "name": "Full name",
     "company": "Business / company",
     "email": "Email address",
+    "phone": "Phone / WhatsApp",
     "invalidEmail": "Please enter a valid email address"
   },
   "project": {

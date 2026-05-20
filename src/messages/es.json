@@ -10,6 +10,7 @@
     "name": "Nombre completo",
     "company": "Negocio / empresa",
     "email": "Correo electrónico",
+    "phone": "Teléfono / WhatsApp",
     "invalidEmail": "Ingresá un correo electrónico válido"
   },
   "project": {
