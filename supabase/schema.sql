@@ -60,7 +60,23 @@ CREATE TABLE IF NOT EXISTS quote_items (
   sort_order   INTEGER DEFAULT 0
 );
 
--- ── 4. promo_codes ───────────────────────────────────────────────────────────
+-- ── 4. service_categories ────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS service_categories (
+  id          TEXT PRIMARY KEY,
+  label       TEXT NOT NULL,
+  icon        TEXT DEFAULT '📦',
+  sort_order  INTEGER DEFAULT 0
+);
+
+INSERT INTO service_categories (id, label, icon, sort_order) VALUES
+  ('automation', 'Process Automation',         '⚙️', 1),
+  ('seo',        'SEO & Local Visibility',      '🔍', 2),
+  ('design',     'Graphic Design & Branding',   '🎨', 3),
+  ('content',    'Content & Copywriting',       '✏️', 4),
+  ('consulting', 'Consulting & Training',       '🎓', 5)
+ON CONFLICT (id) DO NOTHING;
+
+-- ── 5. promo_codes ───────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS promo_codes (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code       TEXT UNIQUE NOT NULL,

@@ -4,16 +4,20 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { PACKAGES, ADDONS, MAINTENANCE, EXTRA_CATEGORIES } from '@/lib/data';
 import { calcQuote, getLineItems, calcPayments, formatAUD, formatDate, formatDateTime } from '@/lib/calc';
-import type { QuoteState, PromoCode } from '@/types/quoter';
+import type { QuoteState, PromoCode, Package, Addon, MaintenancePlan, ExtraCategory } from '@/types/quoter';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 interface QuoterProps {
-  promoCodes: PromoCode[];
+  promoCodes:      PromoCode[];
+  packages:        Package[];
+  addons:          Addon[];
+  maintenance:     MaintenancePlan[];
+  extraCategories: ExtraCategory[];
 }
 
-export default function Quoter({ promoCodes }: QuoterProps) {
+export default function Quoter({ promoCodes, packages, addons, maintenance, extraCategories }: QuoterProps) {
+  const serviceData = { packages, addons, maintenance, extraItems: extraCategories.flatMap(c => c.items) };
   const t = useTranslations();
   const params = useParams();
   const locale = params.locale as string;
@@ -46,14 +50,14 @@ export default function Quoter({ promoCodes }: QuoterProps) {
   const emailError = emailTouched && !!state.clientEmail && !isValidEmail(state.clientEmail);
 
   // ─── Derived state ──────────────────────────────────────────────────────────
-  const calc = calcQuote(state);
-  const items = getLineItems(state);
+  const calc = calcQuote(state, serviceData);
+  const items = getLineItems(state, serviceData);
   const payments = calcPayments(calc.net, state.instalmentMonths);
   const hasItems = items.length > 0;
   const canSend = hasItems && !!state.clientEmail && isValidEmail(state.clientEmail);
   const hasEstimated = items.some(i => i.isEstimated);
   const recommendedMntId = state.packageId
-    ? (PACKAGES.find(p => p.id === state.packageId)?.maintenanceTier ?? null)
+    ? (packages.find(p => p.id === state.packageId)?.maintenanceTier ?? null)
     : null;
 
   // ─── Handlers ───────────────────────────────────────────────────────────────
@@ -429,7 +433,7 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
           {/* Packages */}
           <p className="ck-section-label">💻 {t('packages.sectionTitle')}</p>
           <div className="grid grid-cols-2 gap-[7px] mb-1">
-            {PACKAGES.map(pkg => {
+            {packages.map(pkg => {
               const on = state.packageId === pkg.id;
               return (
                 <button key={pkg.id} onClick={() => togglePackage(pkg.id)}
@@ -449,7 +453,7 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
           {/* Add-ons */}
           <p className="ck-section-label">🧩 {t('addons.sectionTitle')}</p>
           <div className="grid grid-cols-2 gap-1 mb-1">
-            {ADDONS.map(addon => {
+            {addons.map(addon => {
               const on = state.addonIds.has(addon.id);
               return (
                 <button key={addon.id} onClick={() => toggleAddon(addon.id)}
@@ -472,7 +476,7 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
             </span>
           </p>
           <div className="grid grid-cols-3 gap-[7px] mb-1">
-            {MAINTENANCE.map(mnt => {
+            {maintenance.map(mnt => {
               const on = state.maintenanceId === mnt.id;
               const isRec = mnt.id === recommendedMntId;
               return (
@@ -492,7 +496,7 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
           </div>
 
           {/* Extra categories */}
-          {EXTRA_CATEGORIES.map(cat => (
+          {extraCategories.map(cat => (
             <div key={cat.label}>
               <p className="ck-section-label">{cat.icon} {cat.label}</p>
               {cat.items.map(item => {
