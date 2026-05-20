@@ -9,7 +9,8 @@
     "sectionTitle": "Client details",
     "name": "Full name",
     "company": "Business / company",
-    "email": "Email address"
+    "email": "Email address",
+    "invalidEmail": "Please enter a valid email address"
   },
   "project": {
     "sectionTitle": "Project details",
@@ -52,6 +53,8 @@
     "balanceFinanced": "Balance financed (30% + {rate}% interest)",
     "monthlyInstalment": "Monthly instalment",
     "recurring": "Recurring",
+    "financedBalance": "Financed balance",
+    "monthlyCharges": "Monthly charges",
     "totalMonthly": "Total monthly debit"
   },
   "promo": {

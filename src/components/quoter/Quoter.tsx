@@ -37,13 +37,17 @@ export default function Quoter({ promoCodes }: QuoterProps) {
   });
 
   const [sendStatus, setSendStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [emailTouched, setEmailTouched] = useState(false);
+
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const emailError = emailTouched && !!state.clientEmail && !isValidEmail(state.clientEmail);
 
   // ─── Derived state ──────────────────────────────────────────────────────────
   const calc = calcQuote(state);
   const items = getLineItems(state);
   const payments = calcPayments(calc.net, state.instalmentMonths);
   const hasItems = items.length > 0;
-  const canSend = hasItems && !!state.clientEmail;
+  const canSend = hasItems && !!state.clientEmail && isValidEmail(state.clientEmail);
   const hasEstimated = items.some(i => i.isEstimated);
   const recommendedMntId = state.packageId
     ? (PACKAGES.find(p => p.id === state.packageId)?.maintenanceTier ?? null)
@@ -251,7 +255,7 @@ ${otItems.length ? `
     ` : `
     <tr><td style="padding:10px 16px;font-size:13px;color:#555;font-family:Arial,sans-serif;border-bottom:1px solid #e8e0f7">Contract signing (35%)</td><td style="padding:10px 16px;text-align:right;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;font-size:13px">${fAUD(deposit35)}</td></tr>
     <tr><td style="padding:10px 16px;font-size:13px;color:#555;font-family:Arial,sans-serif;border-bottom:1px solid #e8e0f7">Design review (35%)</td><td style="padding:10px 16px;text-align:right;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;font-size:13px">${fAUD(payment35)}</td></tr>
-    <tr><td style="padding:10px 16px;font-size:13px;color:#555;font-family:Arial,sans-serif;border-bottom:1px solid #e8e0f7">Balance financed (30% + ${rate}% interest)</td><td style="padding:10px 16px;text-align:right;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;font-size:13px">${fAUD(financed)}</td></tr>
+    <tr><td style="padding:10px 16px;font-size:13px;color:#555;font-family:Arial,sans-serif;border-bottom:1px solid #e8e0f7">Balance financed (30% + ${rate}% interest)</td><td style="padding:10px 16px;text-align:right;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;font-size:13px">${fAUD(instalment * state.instalmentMonths)}</td></tr>
     <tr style="background:#ede8fb"><td style="padding:11px 16px;font-size:14px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif">Monthly project instalment</td><td style="padding:11px 16px;text-align:right;font-weight:700;color:#A601F1;font-family:Arial,sans-serif;font-size:14px">${fAUD(instalment)}/mo × ${state.instalmentMonths} months</td></tr>
     ${calc.monthly > 0 ? `<tr style="background:#ede8fb"><td style="padding:11px 16px;font-size:14px;font-weight:700;color:#1D2E56;font-family:Arial,sans-serif;border-top:1px solid #d8cff5">Total monthly direct debit</td><td style="padding:11px 16px;text-align:right;font-weight:700;color:#A601F1;font-family:Arial,sans-serif;font-size:14px">${fAUD(instalment + calc.monthly)}/mo</td></tr>` : ''}
     <tr><td colspan="2" style="padding:8px 16px;font-size:11px;color:#aaa;font-family:Arial,sans-serif">Automatic debit via GoCardless · Hosted on CodKave servers</td></tr>
@@ -417,8 +421,20 @@ ${state.notes ? `
               onChange={e => setState(s => ({ ...s, clientName: e.target.value }))} />
             <input className="ck-input" placeholder={t('client.company')} value={state.clientCompany}
               onChange={e => setState(s => ({ ...s, clientCompany: e.target.value }))} />
-            <input className="ck-input !mb-0" placeholder={t('client.email')} type="email" value={state.clientEmail}
-              onChange={e => setState(s => ({ ...s, clientEmail: e.target.value }))} />
+            <input
+              className={`ck-input ${emailError ? '!border-[#e57373] !mb-1' : '!mb-0'}`}
+              placeholder={t('client.email')}
+              type="email"
+              value={state.clientEmail}
+              onChange={e => {
+                setState(s => ({ ...s, clientEmail: e.target.value }));
+                if (emailTouched) setEmailTouched(true);
+              }}
+              onBlur={() => { if (state.clientEmail) setEmailTouched(true); }}
+            />
+            {emailError && (
+              <p className="text-[11px] text-[#e57373] mb-2 px-0.5">{t('client.invalidEmail')}</p>
+            )}
           </div>
 
           {/* Project details */}
@@ -603,23 +619,44 @@ ${state.notes ? `
                   <>
                     <PayRow label={t('summary.contractSigning')} value={formatAUD(payments.deposit35)} />
                     <PayRow label={t('summary.designReview')} value={formatAUD(payments.payment35)} />
-                    <PayRow label={t('summary.finalDelivery')} value={formatAUD(payments.balance)} last />
+                    <PayRow label={t('summary.finalDelivery')} value={formatAUD(payments.balance)} last={calc.monthly === 0} />
+                    {calc.monthly > 0 && (
+                      <>
+                        <p className="text-[9px] font-bold text-[#A601F1] uppercase tracking-[1.5px] mt-2.5 mb-1">
+                          {t('summary.monthlyCharges')}
+                        </p>
+                        {items.filter(i => i.isMonthly).map(item => (
+                          <PayRow key={item.name} label={item.name} value={`${formatAUD(item.price)}/mo`} />
+                        ))}
+                        <PayRow label={t('summary.totalMonthly')} value={`${formatAUD(calc.monthly)}/mo`} bold accent last />
+                      </>
+                    )}
                   </>
                 ) : (
                   <>
                     <PayRow label={t('summary.contractSigning')} value={formatAUD(payments.deposit35)} />
-                    <PayRow label={t('summary.designReview')} value={formatAUD(payments.payment35)} />
+                    <PayRow label={t('summary.designReview')} value={formatAUD(payments.payment35)} last />
+
+                    <p className="text-[9px] font-bold text-[#A601F1] uppercase tracking-[1.5px] mt-2.5 mb-1">
+                      {t('summary.monthlyCharges')}
+                    </p>
+
                     <PayRow
-                      label={t('summary.balanceFinanced', { rate: state.instalmentMonths === 3 ? '5' : '8' })}
-                      value={formatAUD(payments.financed)}
+                      label={t('summary.financedBalance')}
+                      value={formatAUD(payments.instalment * state.instalmentMonths)}
                     />
-                    <PayRow label={t('summary.monthlyInstalment')} value={`${formatAUD(payments.instalment)}/mo x ${state.instalmentMonths}`} bold accent />
-                    {calc.monthly > 0 && (
-                      <>
-                        <PayRow label={t('summary.recurring')} value={`${formatAUD(calc.monthly)}/mo`} />
-                        <PayRow label={t('summary.totalMonthly')} value={`${formatAUD(payments.instalment + calc.monthly)}/mo`} bold accent last />
-                      </>
-                    )}
+                    <PayRow
+                      label={t('summary.monthlyInstalment')}
+                      value={`${formatAUD(payments.instalment)}/mo × ${state.instalmentMonths}`}
+                    />
+                    {items.filter(i => i.isMonthly).map(item => (
+                      <PayRow key={item.name} label={item.name} value={`${formatAUD(item.price)}/mo`} />
+                    ))}
+                    <PayRow
+                      label={t('summary.totalMonthly')}
+                      value={`${formatAUD(payments.instalment + calc.monthly)}/mo`}
+                      bold accent last
+                    />
                   </>
                 )}
               </div>
@@ -682,8 +719,10 @@ ${state.notes ? `
              '📤 ' + t('actions.sendToClient')}
           </button>
 
-          {!state.clientEmail && hasItems && (
-            <p className="text-[11px] text-[#e57373] text-center mb-1.5">{t('actions.emailRequired')}</p>
+          {hasItems && !canSend && (
+            <p className="text-[11px] text-[#e57373] text-center mb-1.5">
+              {!state.clientEmail ? t('actions.emailRequired') : t('client.invalidEmail')}
+            </p>
           )}
 
           <p className="text-[11px] text-[#bbb] text-center mt-1">{t('actions.validity')}</p>

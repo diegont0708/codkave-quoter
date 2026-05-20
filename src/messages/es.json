@@ -9,7 +9,8 @@
     "sectionTitle": "Datos del cliente",
     "name": "Nombre completo",
     "company": "Negocio / empresa",
-    "email": "Correo electrónico"
+    "email": "Correo electrónico",
+    "invalidEmail": "Ingresá un correo electrónico válido"
   },
   "project": {
     "sectionTitle": "Detalles del proyecto",
@@ -52,6 +53,8 @@
     "balanceFinanced": "Saldo financiado (30% + {rate}% interés)",
     "monthlyInstalment": "Cuota mensual",
     "recurring": "Recurrente",
+    "financedBalance": "Saldo financiado",
+    "monthlyCharges": "Cargos mensuales",
     "totalMonthly": "Débito mensual total"
   },
   "promo": {
