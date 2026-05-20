@@ -59,6 +59,9 @@ export interface QuoteState {
   clientName: string;
   clientCompany: string;
   clientEmail: string;
+  projectName: string;
+  timeline: string;
+  notes: string;
   promoCode: PromoCode | null;
   promoInput: string;
   promoError: string;
