@@ -100,7 +100,7 @@ export default function Quoter({ promoCodes }: QuoterProps) {
       })).catch(() => '');
 
     const { net, discount } = calc;
-    const { deposit35, payment35, balance, financed, instalment } = payments;
+    const { deposit35, payment35, balance, instalment } = payments;
     const now = new Date();
     const exp = new Date(now.getTime() + 48 * 3_600_000);
     const otItems = items.filter(i => !i.isMonthly);
