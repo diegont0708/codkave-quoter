@@ -196,7 +196,7 @@ export default function ServicesPage() {
                   <label className="flex items-center gap-1.5 text-[12px] text-[#666] cursor-pointer">
                     <input type="checkbox" checked={newService.is_from}
                       onChange={e => setNewService(s => ({ ...s, is_from: e.target.checked }))} />
-                    Price is "from" (estimated)
+                    Price is &quot;from&quot; (estimated)
                   </label>
                 </div>
                 <div className="flex gap-2">
