@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── Fire n8n webhook (full payload including pdf_base64) ───────────────────
+    // ── Fire n8n webhook ──────────────────────────────────────────────────────
     const webhookUrl = process.env.N8N_WEBHOOK_URL;
     if (webhookUrl) {
       await fetch(webhookUrl, {
@@ -65,7 +65,6 @@ export async function POST(req: NextRequest) {
           channel,
           client,
           quote,
-          pdf_base64: pdf_base64 ?? null,
           sent_at,
           quote_id: savedQuote?.id ?? null,
         }),
