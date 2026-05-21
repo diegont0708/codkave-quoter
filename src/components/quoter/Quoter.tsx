@@ -311,15 +311,6 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
     const { deposit35, payment35, balance, instalment } = payments;
 
     try {
-      // Generate PDF and encode as base64 for n8n
-      const pdfBlob = await buildPDFBlob();
-      const pdfBase64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve((reader.result as string).split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(pdfBlob);
-      });
-
       const payload = {
         channel: 'presencial',
         client: {
@@ -329,6 +320,7 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
           phone:   state.clientPhone,
           abn:     state.clientAbn,
           address: state.clientAddress,
+          notes:   state.notes ?? '',
         },
         quote: {
           items: items.map(i => ({ name: i.name, price: i.price, recurring: i.isMonthly, estimated: i.isEstimated })),
@@ -344,8 +336,7 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
           instalment_amount: state.paymentPlan === 'inst' ? instalment : null,
           promo_code:        state.promoCode?.code ?? null,
         },
-        pdf_base64: pdfBase64,
-        sent_at:    new Date().toISOString(),
+        sent_at: new Date().toISOString(),
       };
 
       const res = await fetch('/api/quotes', {
