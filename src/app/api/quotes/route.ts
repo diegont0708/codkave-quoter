@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { channel = 'presencial', client, quote, pdf_base64, sent_at } = body;
+    const { channel = 'presencial', client, quote, sent_at } = body;
 
     const supabase = await createClient();
 
