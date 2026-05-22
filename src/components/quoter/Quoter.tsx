@@ -419,7 +419,9 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
             <p className="text-[13px] font-medium mb-2.5 text-[#1D2E56]">{t('project.sectionTitle')}</p>
             <input className="ck-input" placeholder={t('project.name')} value={state.projectName}
               onChange={e => setState(s => ({ ...s, projectName: e.target.value }))} />
-            <select className="ck-input bg-white" value={state.timeline}
+            <div>
+              <p className="text-[11px] text-[#888] mb-1 px-0.5">{t('project.timeline')}</p>
+            <select className="ck-input !mb-0 bg-white" value={state.timeline}
               onChange={e => setState(s => ({ ...s, timeline: e.target.value }))}>
               <option value="To be confirmed">To be confirmed</option>
               <option value="1-2 weeks">1-2 weeks</option>
@@ -429,6 +431,7 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
               <option value="8-12 weeks">8-12 weeks</option>
               <option value="3-6 months">3-6 months</option>
             </select>
+            </div>
             <textarea className="ck-input !mb-0 resize-none" rows={3} placeholder={t('project.notes')} value={state.notes}
               onChange={e => setState(s => ({ ...s, notes: e.target.value }))} />
           </div>

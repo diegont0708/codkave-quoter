@@ -18,7 +18,7 @@
   "project": {
     "sectionTitle": "Project details",
     "name": "Project name (e.g. Business website)",
-    "timeline": "Estimated timeline (e.g. 4–6 weeks)",
+    "timeline": "Estimated timeline",
     "notes": "Additional notes (optional)"
   },
   "packages": {
