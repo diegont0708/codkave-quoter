@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { calcQuote, getLineItems, calcPayments, formatAUD, formatDate, formatDateTime } from '@/lib/calc';
+import { calcQuote, getLineItems, calcPayments, formatAUD } from '@/lib/calc';
 import type { QuoteState, PromoCode, Package, Addon, MaintenancePlan, ExtraCategory } from '@/types/quoter';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
