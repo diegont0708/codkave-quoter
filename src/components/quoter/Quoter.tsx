@@ -282,24 +282,6 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
     return pdf.output('blob');
   };
 
-  const generatePDF = async () => {
-    if (!hasItems || pdfStatus === 'loading') return;
-    setPdfStatus('loading');
-    try {
-      const blob = await buildPDFBlob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `CodKave-${(state.clientName || 'quote').replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-      setPdfStatus('idle');
-    } catch (err) {
-      console.error('[generatePDF]', err);
-      setPdfStatus('error');
-      setTimeout(() => setPdfStatus('idle'), 3000);
-    }
-  };
 
 
   // ─── Send to Client ──────────────────────────────────────────────────────────
