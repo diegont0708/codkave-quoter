@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { channel = 'presencial', client, quote, sent_at } = body;
+    const { channel = 'presencial', quote_number, client, quote, sent_at } = body;
 
     const supabase = await createClient();
 
@@ -63,10 +63,11 @@ export async function POST(req: NextRequest) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           channel,
+          quote_number: quote_number ?? null,
+          quote_id:     savedQuote?.id ?? null,
           client,
           quote,
           sent_at,
-          quote_id: savedQuote?.id ?? null,
         }),
       }).catch(err => console.error('Webhook error:', err));
     }

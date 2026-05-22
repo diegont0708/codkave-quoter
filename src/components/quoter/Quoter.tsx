@@ -309,10 +309,13 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
 
     const { net, discount, monthly } = calc;
     const { deposit35, payment35, balance, instalment } = payments;
+    const now = new Date();
+    const quoteNumber = `CK-${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
 
     try {
       const payload = {
         channel: 'presencial',
+        quote_number: quoteNumber,
         client: {
           name:    state.clientName,
           company: state.clientCompany,
