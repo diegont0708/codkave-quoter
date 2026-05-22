@@ -113,7 +113,7 @@ export default function Quoter({ promoCodes, packages, addons, maintenance, extr
     const moItems = items.filter(i => i.isMonthly);
     const fAUD = formatAUD;
     const rate = state.instalmentMonths === 3 ? 5 : 8;
-    const quoteNumber = `CK-${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+    const quoteNumber = `CK-${String(now.getFullYear()).slice(2)}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
     const paymentTermsLabel = state.paymentPlan === 'full' ? '35% · 35% · 30%' : `35% deposit + ${state.instalmentMonths}-mo plan`;
 
     const thStyle = `padding:9px 14px;font-size:9px;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:1.5px;font-family:Arial,sans-serif;font-weight:700;text-align:left`;
@@ -310,7 +310,7 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
     const { net, discount, monthly } = calc;
     const { deposit35, payment35, balance, instalment } = payments;
     const now = new Date();
-    const quoteNumber = `CK-${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+    const quoteNumber = `CK-${String(now.getFullYear()).slice(2)}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
 
     try {
       const payload = {
