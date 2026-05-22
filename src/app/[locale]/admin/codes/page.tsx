@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -20,13 +20,13 @@ export default function CodesPage() {
 
   const supabase = createClient();
 
-  const loadCodes = async () => {
+  const loadCodes = useCallback(async () => {
     const { data } = await supabase.from('promo_codes').select('*').order('created_at', { ascending: false });
     if (data) setCodes(data.map(r => ({ ...r, type: r.type as 'percent' | 'fixed' })));
     setLoading(false);
-  };
+  }, [supabase]);
 
-  useEffect(() => { loadCodes(); }, []);
+  useEffect(() => { loadCodes(); }, [loadCodes]);
 
   const toggleCode = async (id: string, active: boolean) => {
     await supabase.from('promo_codes').update({ active: !active }).eq('id', id);
