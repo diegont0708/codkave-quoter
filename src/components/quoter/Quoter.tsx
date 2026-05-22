@@ -687,16 +687,6 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
           </div>
 
           {/* Action buttons */}
-          <button onClick={generatePDF} disabled={!hasItems}
-            className={`w-full rounded-[9px] py-3 text-[13px] font-medium mb-1.5 flex items-center justify-center gap-1.5 transition-all border-none
-              ${!hasItems || pdfStatus === 'loading'
-                ? 'bg-[rgba(29,46,86,0.09)] text-[#bbb] cursor-default'
-                : pdfStatus === 'error'
-                ? 'bg-[#e57373] text-white cursor-pointer'
-                : 'bg-gradient-to-br from-[#A601F1] to-[#7a00b8] text-white cursor-pointer shadow-[0_4px_12px_rgba(166,1,241,0.3)]'}`}>
-            {pdfStatus === 'loading' ? '⏳ Generating PDF…' : pdfStatus === 'error' ? '❌ Error — try again' : `📄 ${t('actions.downloadPdf')}`}
-          </button>
-
           <button onClick={sendToClient} disabled={!canSend || sendStatus === 'sending'}
             className={`w-full rounded-[9px] py-3 text-[13px] font-medium mb-1.5 flex items-center justify-center gap-1.5 transition-all border-none
               ${sendStatus === 'sent' ? 'bg-gradient-to-br from-[#4CAF50] to-[#2e7d32] text-white cursor-default' :
