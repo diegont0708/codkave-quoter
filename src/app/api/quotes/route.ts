@@ -4,7 +4,11 @@ import { createClient } from '@/lib/supabase/server';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { channel = 'presencial', quote_number, client, quote, sent_at } = body;
+    const { channel = 'presencial', client, quote, sent_at } = body;
+
+    // Generate quote number server-side to ensure consistency
+    const now = new Date();
+    const quote_number = `CK-${String(now.getFullYear()).slice(2)}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
 
     const supabase = await createClient();
 
@@ -63,7 +67,7 @@ export async function POST(req: NextRequest) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           channel,
-          quote_number: quote_number ?? null,
+          quote_number,
           quote_id:     savedQuote?.id ?? null,
           client,
           quote,
