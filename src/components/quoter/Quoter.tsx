@@ -92,10 +92,8 @@ export default function Quoter({ promoCodes, packages, addons, maintenance, extr
     }
   };
 
-  // ─── PDF Generation ─────────────────────────────────────────────────────────
-  const [pdfStatus, setPdfStatus] = useState<'idle' | 'loading' | 'error'>('idle');
-
-  const buildPDFBlob = async (): Promise<Blob> => {
+  // ─── (PDF generation removed — flow goes through n8n) ───────────────────────
+  const _buildPDFBlob = async (): Promise<Blob> => {
     const logoDataUrl = await fetch('/Logotipo Codkave.png')
       .then(r => r.blob())
       .then(b => new Promise<string>((resolve, reject) => {
