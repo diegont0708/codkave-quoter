@@ -36,7 +36,7 @@ export default function Quoter({ promoCodes, packages, addons, maintenance, extr
     clientAbn: '',
     clientAddress: '',
     projectName: '',
-    timeline: '',
+    timeline: 'To be confirmed',
     notes: '',
     promoCode: null,
     promoInput: '',
@@ -327,6 +327,7 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
         },
         quote: {
           items: items.map(i => ({ name: i.name, price: i.price, recurring: i.isMonthly, estimated: i.isEstimated })),
+          timeline:          state.timeline,
           subtotal:          net + discount,
           discount,
           total_onetime:     net,
@@ -418,8 +419,16 @@ ${state.notes ? `<tr><td style="padding:20px 40px 0">
             <p className="text-[13px] font-medium mb-2.5 text-[#1D2E56]">{t('project.sectionTitle')}</p>
             <input className="ck-input" placeholder={t('project.name')} value={state.projectName}
               onChange={e => setState(s => ({ ...s, projectName: e.target.value }))} />
-            <input className="ck-input" placeholder={t('project.timeline')} value={state.timeline}
-              onChange={e => setState(s => ({ ...s, timeline: e.target.value }))} />
+            <select className="ck-input bg-white" value={state.timeline}
+              onChange={e => setState(s => ({ ...s, timeline: e.target.value }))}>
+              <option value="To be confirmed">To be confirmed</option>
+              <option value="1-2 weeks">1-2 weeks</option>
+              <option value="2-4 weeks">2-4 weeks</option>
+              <option value="4-6 weeks">4-6 weeks</option>
+              <option value="6-8 weeks">6-8 weeks</option>
+              <option value="8-12 weeks">8-12 weeks</option>
+              <option value="3-6 months">3-6 months</option>
+            </select>
             <textarea className="ck-input !mb-0 resize-none" rows={3} placeholder={t('project.notes')} value={state.notes}
               onChange={e => setState(s => ({ ...s, notes: e.target.value }))} />
           </div>
